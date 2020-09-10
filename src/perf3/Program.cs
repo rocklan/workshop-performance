@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace perf
 {
@@ -16,7 +16,7 @@ namespace perf
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
-                new Program().WritePeopleOrderedByCountryAsync("output.txt");
+                new Program().WritePeoplePerCountry("output.txt");
 
                 sw.Stop();
 
@@ -27,41 +27,59 @@ namespace perf
                 Console.WriteLine(e);
                 
             }
-            //Console.WriteLine("Press enter to quit...");
-            //Console.ReadLine();
         }
 
 
-        public async Task WritePeopleOrderedByCountryAsync(string outputFileName)
+        public void WritePeoplePerCountry(string outputFileName)
         {
             if (System.IO.File.Exists(outputFileName))
             {
                 System.IO.File.Delete(outputFileName);
             }
 
-            StringBuilder sb = new StringBuilder();
+            var people = GetPeople();
 
-            for (int i = 0; i < 5; i++)
+            string output = "";
+            string countryName = "";
+
+            foreach (var person in people)
             {
-                List<Country> countries = await GetCountriesAsync();
-
-                foreach (Country country in countries)
+                output += person.ToString();
+                if (countryName != person.CountryName)
                 {
-                    List<Person> people = await GetPeopleFromCountryAsync(country.CountryID);
+                    countryName = person.CountryName;
+                    Console.WriteLine(countryName);
+                }    
+            }
 
-                    foreach (Person person in people)
+            System.IO.File.AppendAllText(outputFileName, output);
+        }
+
+
+        public List<Person> GetPeople()
+        {
+            using (SqlConnection sc = new SqlConnection(_localDb))
+            {
+                sc.Open();
+
+                string sql = "SELECT p.personid, p.firstname, p.lastname, c.countryname " +
+                             "FROM   person p inner join country c on p.countryid = c.countryid " +
+                             "order by c.countryName";
+
+                using (SqlCommand command = new SqlCommand(sql, sc))
+                {
+                    using (SqlDataReader sqlDataReader = command.ExecuteReader())
                     {
-                        string output = country.CountryName + " - " +
-                            person.FirstName + " " + person.LastName + Environment.NewLine;
-
-                        sb.Append(output);
+                        List<Person> people = new List<Person>();
+                        while (sqlDataReader.Read())
+                        {
+                            people.Add(new Person(sqlDataReader));
+                        }
+                        return people;
                     }
                 }
             }
-
-            System.IO.File.AppendAllText(outputFileName, sb.ToString());
         }
-
 
         private string _localDb
         {
@@ -73,78 +91,9 @@ namespace perf
                 return "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;AttachDbFileName=" + datafile;
             }
         }
-
-
-
-        public async Task<List<Person>> GetPeopleFromCountryAsync(int? CountryID, int limit = 999999)
-        {
-            using (System.Data.SqlClient.SqlConnection sc = new System.Data.SqlClient.SqlConnection(_localDb))
-            {
-                sc.Open();
-
-                string sql = "SELECT TOP " + limit +
-                             "       p.personid, p.firstname, p.lastname, c.countryname " +
-                             "FROM   person p inner join country c on p.countryid = c.countryid" +
-                             ((CountryID.HasValue) ? " WHERE p.CountryId=" + CountryID : "");
-
-                using (SqlCommand command = new SqlCommand(sql, sc))
-                {
-                    var people = new List<Person>();
-                    using (SqlDataReader sqlDataReader = await command.ExecuteReaderAsync())
-                    {
-                        bool readOk = await sqlDataReader.ReadAsync();
-                        while (readOk)
-                        {
-                            people.Add(new Person(sqlDataReader));
-                            readOk = await sqlDataReader.ReadAsync();
-                        }
-                        sc.Close();
-                    }
-
-                    return people;
-                }
-            }
-        }
-
-        public async Task<List<Country>> GetCountriesAsync()
-        {
-            using (System.Data.SqlClient.SqlConnection sc = new System.Data.SqlClient.SqlConnection(_localDb))
-            {
-                sc.Open();
-
-                using (SqlCommand command = new SqlCommand("select CountryID, CountryName from country order by CountryName", sc))
-                {
-                    List<Country> countries = new List<Country>();
-                    using (SqlDataReader sqlDataReader = await command.ExecuteReaderAsync())
-                    {
-                        bool readOk = await sqlDataReader.ReadAsync();
-                        while (readOk)
-                        {
-                            countries.Add(new Country
-                            {
-                                CountryID = sqlDataReader.GetInt32(0),
-                                CountryName = sqlDataReader.GetString(1),
-                            });
-                            readOk = await sqlDataReader.ReadAsync();
-                        }
-                        sc.Close();
-
-                        return countries;
-                    }
-                }
-            }
-        }
-
-
-
     }
 
 
-    public class Country
-    {
-        public int CountryID { get; set; }
-        public string CountryName { get; set; }
-    }
 
     public class Person
     {
@@ -166,7 +115,5 @@ namespace perf
         {
             return this.CountryName + " - " + this.FirstName + " " + this.LastName + Environment.NewLine;
         }
-
     }
-
 }

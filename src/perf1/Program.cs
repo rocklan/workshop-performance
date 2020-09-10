@@ -45,9 +45,7 @@ namespace perf
 
                 if (person != null)
                 {
-                    string output = person.ToString();
-
-                    System.IO.File.AppendAllText(outputFileName, output);
+                    System.IO.File.AppendAllText(outputFileName, person.ToString());
 
                     if (peopleWritten % 100 == 0)
                     {
