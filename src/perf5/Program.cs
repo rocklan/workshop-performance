@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace perf
@@ -40,23 +41,25 @@ namespace perf
 
             StringBuilder sb = new StringBuilder();
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
                 List<Country> countries = GetCountries();
 
                 foreach (Country country in countries)
                 {
-                    List<Person> people = GetPeopleFromCountry(country.CountryID);
+                    var people = GetPeople(country.CountryID);
 
-                    foreach (Person person in people)
+                    foreach (var person in people)
                     {
-                        string output = country.CountryName + " - " +
-                            person.FirstName + " " + person.LastName + Environment.NewLine;
-
-                        sb.Append(output);
+                        sb.Append(person.CountryName);
+                        sb.Append(" - ");
+                        sb.Append(person.FirstName);
+                        sb.Append(" ");
+                        sb.Append(person.LastName);
+                        sb.Append(Environment.NewLine);
                     }
                 }
-            }
+            }            
 
             System.IO.File.AppendAllText(outputFileName, sb.ToString());
         }
@@ -90,7 +93,7 @@ namespace perf
         }
 
 
-        public List<Person> GetPeopleFromCountry(int? CountryID, int limit = 999999)
+        public List<Person> GetPeople(int? CountryID = null, int limit = 999999)
         {
             using (SqlConnection sc = new SqlConnection(_localDb))
             {
@@ -111,9 +114,8 @@ namespace perf
                             people.Add(new Person(sqlDataReader));
                         }
                         sc.Close();
+                        return people;
                     }
-
-                    return people;
                 }
             }
         }
