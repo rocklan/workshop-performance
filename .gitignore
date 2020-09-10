@@ -1,7 +1,4 @@
-*.user
-debug
-bin
 obj
-release
-.vs
-perf/data/peopledb_log.ldf
+bin
+*.vs
+*.ldf
