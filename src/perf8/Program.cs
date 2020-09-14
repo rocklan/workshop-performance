@@ -16,7 +16,7 @@ namespace perf
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
-                new Program().WritePeopleOrderedByCountryAsync("output.txt");
+                new Program().WritePeopleOrderedByCountryAsync("output.txt").Wait();
 
                 sw.Stop();
 
