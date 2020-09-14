@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -16,7 +17,7 @@ namespace perf7
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
-                new Program().CalculateChecksums("hashes.txt");
+                new Program().CalculateChecksums("encrypted.txt");
 
                 sw.Stop();
 
@@ -29,7 +30,7 @@ namespace perf7
             }
         }
 
-      
+
         private void CalculateChecksums(string filename)
         {
             if (System.IO.File.Exists(filename))
@@ -38,46 +39,23 @@ namespace perf7
             }
 
             StringBuilder sb = new StringBuilder();
+            
+            var people = GetPeople();
 
-            var names = GetNamesToHash();
-
-            Console.WriteLine($"Calculating {names.Count} hashes... ");
-
-            foreach (var name in names)
+            for (int i=0;i<10000;i++)
             {
-                using (var md5 = MD5.Create())
-                {
-                    byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(name);
-                    byte[] hashBytes = md5.ComputeHash(inputBytes);
+                string encrypted = StringCipher.Encrypt(people[i].ToString(), "my passphrase is this");
 
-                    string hash = Convert.ToBase64String(hashBytes);
+                sb.Append(encrypted);
+                sb.Append(Environment.NewLine);
 
-                    sb.Append(name);
-                    sb.Append(" - ");
-                    sb.Append(hash);
-                    sb.Append(Environment.NewLine);
-                }
+                if (i % 100 == 0)
+                    Console.WriteLine(i);
             }
 
             System.IO.File.AppendAllText(filename, sb.ToString());
+            
         }
-
-        private List<string> GetNamesToHash()
-        {
-            var people = GetPeople();
-            List<string> namesToHash = new List<string>(people.Count * 1000);
-
-            for (int i = 0; i < 1000; i++)
-            {
-                for (int x = 0; x < people.Count; x++)
-                {
-                    namesToHash.Add($"{i} {people[x].FirstName} {people[x].LastName}");
-                }
-            }
-
-            return namesToHash;
-        }
-
 
         public List<Person> GetPeople()
         {
