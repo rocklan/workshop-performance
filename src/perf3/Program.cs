@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace perf
+namespace perf3
 {
     class Program
     {
@@ -32,6 +32,9 @@ namespace perf
 
         public void WritePeoplePerCountry(string outputFileName)
         {
+            // This function is really slow. Run the performance profiler and work out what it's doing all the time.
+            // You might be able to fix it by using a StringBuilder
+
             if (System.IO.File.Exists(outputFileName))
             {
                 System.IO.File.Delete(outputFileName);
@@ -62,7 +65,7 @@ namespace perf
             {
                 sc.Open();
 
-                string sql = "SELECT p.personid, p.firstname, p.lastname, c.countryname " +
+                string sql = "SELECT top 50000 p.personid, p.firstname, p.lastname, c.countryname " +
                              "FROM   person p inner join country c on p.countryid = c.countryid " +
                              "order by c.countryName";
 

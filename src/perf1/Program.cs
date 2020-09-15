@@ -18,7 +18,7 @@ namespace perf
                 new Program().WriteFirstThousandPeople("output.txt");
 
                 sw.Stop();
-
+                
                 Console.WriteLine("Application took: " + ((decimal)sw.ElapsedMilliseconds / 1000).ToString("N2") + " seconds");
             }
             catch (Exception e)
@@ -31,6 +31,10 @@ namespace perf
 
         public void WriteFirstThousandPeople(string outputFileName)
         {
+            // This function is really slow for some reason. Run the performance profiler and work out what's slow
+            // To fix the performance problem, consider using a string to build the output data and flushing it out
+            // right at the end of the function
+
             if (System.IO.File.Exists(outputFileName))
             {
                 System.IO.File.Delete(outputFileName);

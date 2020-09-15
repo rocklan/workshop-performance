@@ -35,6 +35,10 @@ namespace perf7
 
         private void CalculateChecksums(string filename)
         {
+            // This function seems really slow. Run the profiler to see what's running so slow.
+            // To improve the speed, you might need to take advantage of multiple cores of your CPU. 
+            // Check out the function ParallelForEachExample() below and see what you can do.
+
             if (System.IO.File.Exists(filename))
             {
                 System.IO.File.Delete(filename);

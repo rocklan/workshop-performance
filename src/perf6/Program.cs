@@ -32,6 +32,10 @@ namespace perf6
 
         private void CalculateChecksums(string filename)
         {
+            // This function seems really slow. Run the performance profiler and
+            // work out what it's doing most of the time. To fix it, you might 
+            // just need to move the order of a statement.
+
             if (System.IO.File.Exists(filename))
             {
                 System.IO.File.Delete(filename);

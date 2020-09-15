@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace perf
+namespace perf5
 {
     class Program
     {
@@ -27,13 +27,16 @@ namespace perf
                 Console.WriteLine(e);
                 
             }
-            //Console.WriteLine("Press enter to quit...");
-            //Console.ReadLine();
         }
 
 
         public void WritePeopleOrderedByCountry(string outputFileName)
         {
+            // This function is really slow. Surely there must be a faster way 
+            // to create a list of all people sorted by country name. Run the
+            // profiler and see what's slow. To fix the issue, you might want
+            // to see if you can accomplish the same thing with less database calls.
+
             if (System.IO.File.Exists(outputFileName))
             {
                 System.IO.File.Delete(outputFileName);
