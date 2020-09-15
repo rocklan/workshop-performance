@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
+using Microsoft.Extensions.Caching.Memory;
+
 namespace perf3
 {
     class Program
@@ -16,7 +18,7 @@ namespace perf3
             {
                 Stopwatch sw = Stopwatch.StartNew();
 
-                new Program().WritePeoplePerCountry("output.txt");
+                new Program().WritePeopleWithCountryName("output.txt");
 
                 sw.Stop();
 
@@ -25,64 +27,108 @@ namespace perf3
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                
+
             }
         }
 
+        MemoryCache _myCache = new MemoryCache(new MemoryCacheOptions());
 
-        public void WritePeoplePerCountry(string outputFileName)
+
+        public void WritePeopleWithCountryName(string outputFileName)
         {
-            // This function is really slow. Run the performance profiler and work out what it's doing all the time.
-            // You might be able to fix it by using a StringBuilder
+            // This function is really slow. Surely there must be a faster way 
+            // to create a list of all people sorted by country name. Run the
+            // profiler and see what's slow. To fix the issue, you might want
+            // to investigate the GetCountryNameCached() function
+
 
             if (System.IO.File.Exists(outputFileName))
             {
                 System.IO.File.Delete(outputFileName);
             }
 
-            var people = GetPeople();
+            StringBuilder sb = new StringBuilder();
 
-            string output = "";
-            string countryName = "";
-
-            foreach (var person in people)
+            int i = 0;
+            foreach (var person in GetPeople())
             {
-                output += person.ToString();
-                if (countryName != person.CountryName)
-                {
-                    countryName = person.CountryName;
-                    Console.WriteLine(countryName);
-                }    
+                var countryName = GetCountryName(person.CountryID);
+
+                sb.Append(countryName);
+                sb.Append(" - ");
+                sb.Append(person.FirstName);
+                sb.Append(" ");
+                sb.Append(person.LastName);
+                sb.Append(Environment.NewLine);
+
+                if (++i % 1000 == 0)
+                    Console.WriteLine(i);
             }
 
-            System.IO.File.AppendAllText(outputFileName, output);
+            System.IO.File.AppendAllText(outputFileName, sb.ToString());
         }
 
-
-        public List<Person> GetPeople()
+      
+        public string GetCountryName(int CountryID)
         {
             using (SqlConnection sc = new SqlConnection(_localDb))
             {
                 sc.Open();
 
-                string sql = "SELECT top 50000 p.personid, p.firstname, p.lastname, c.countryname " +
-                             "FROM   person p inner join country c on p.countryid = c.countryid " +
-                             "order by c.countryName";
+                using (SqlCommand command = new SqlCommand("select CountryName from country where countryId = " + CountryID, sc))
+                {
+                    List<Country> countries = new List<Country>();
+                    using (SqlDataReader sqlDataReader = command.ExecuteReader())
+                    {
+                        string countryName = "";
+                        if (sqlDataReader.Read())
+                        {
+                            countryName = sqlDataReader.GetString(0);
+                        }
+                        sc.Close();
+
+                        return countryName;
+                    }
+                }
+            }
+        }
+
+        public string GetCountryNameCached(int CountryID)
+        {
+            return _myCache.GetOrCreate<string>(CountryID, (x) =>
+            {
+                return GetCountryName(CountryID);
+            });
+        }
+
+
+        public List<Person> GetPeople(int? CountryID = null, int limit = 999999)
+        {
+            using (SqlConnection sc = new SqlConnection(_localDb))
+            {
+                sc.Open();
+
+                string sql = "SELECT TOP " + limit +
+                             "       p.personid, p.firstname, p.lastname, p.CountryId " +
+                             "FROM   person p " +
+                             ((CountryID.HasValue) ? " WHERE p.CountryId=" + CountryID : "");
 
                 using (SqlCommand command = new SqlCommand(sql, sc))
                 {
+                    var people = new List<Person>();
                     using (SqlDataReader sqlDataReader = command.ExecuteReader())
                     {
-                        List<Person> people = new List<Person>();
                         while (sqlDataReader.Read())
                         {
                             people.Add(new Person(sqlDataReader));
                         }
+                        sc.Close();
                         return people;
                     }
                 }
             }
         }
+
 
         private string _localDb
         {
@@ -94,9 +140,16 @@ namespace perf3
                 return "Server=(localdb)\\MSSQLLocalDB;Integrated Security=true;AttachDbFileName=" + datafile;
             }
         }
+
+
     }
 
 
+    public class Country
+    {
+        public int CountryID { get; set; }
+        public string CountryName { get; set; }
+    }
 
     public class Person
     {
@@ -111,12 +164,11 @@ namespace perf3
             this.PersonID = sqlDataReader.GetInt32(0);
             this.FirstName = sqlDataReader.GetString(1);
             this.LastName = sqlDataReader.GetString(2);
-            this.CountryName = sqlDataReader.GetString(3);
+            this.CountryID = sqlDataReader.GetInt32(3);
         }
 
-        public override string ToString()
-        {
-            return this.CountryName + " - " + this.FirstName + " " + this.LastName + Environment.NewLine;
-        }
+     
+
     }
+
 }
