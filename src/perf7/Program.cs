@@ -40,16 +40,17 @@ namespace perf7
 
             StringBuilder sb = new StringBuilder();
             
-            var people = GetPeople();
+            var people = GetPeople(10000);
+            int i = 0;
 
-            for (int i=0;i<10000;i++)
+            foreach (Person person in people)
             {
-                string encrypted = StringCipher.Encrypt(people[i].ToString(), "my passphrase is this");
+                string encrypted = StringCipher.Encrypt(person.ToString(), "my passphrase is this");
 
                 sb.Append(encrypted);
                 sb.Append(Environment.NewLine);
 
-                if (i % 100 == 0)
+                if ((++i) % 100 == 0)
                     Console.WriteLine(i);
             }
 
@@ -57,13 +58,13 @@ namespace perf7
             
         }
 
-        public List<Person> GetPeople()
+        public List<Person> GetPeople(int limit)
         {
             using (SqlConnection sc = new SqlConnection(_localDb))
             {
                 sc.Open();
 
-                string sql = "SELECT p.personid, p.firstname, p.lastname, c.countryname " +
+                string sql = "SELECT top " + limit + " p.personid, p.firstname, p.lastname, c.countryname " +
                              "FROM   person p inner join country c on p.countryid = c.countryid " +
                              "order by c.countryName";
 
