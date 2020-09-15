@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -6,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace perf7
 {
@@ -39,9 +41,9 @@ namespace perf7
             }
 
             StringBuilder sb = new StringBuilder();
-            
-            var people = GetPeople(10000);
+
             int i = 0;
+            var people = GetPeople(20000);
 
             foreach (Person person in people)
             {
@@ -94,6 +96,22 @@ namespace perf7
             }
         }
 
+
+        private void ParallelForEachExample()
+        {
+            var people = GetPeople(100000);
+
+            ConcurrentBag<int> threads = new ConcurrentBag<int>();
+
+            Parallel.ForEach(people, (person, loopState) =>
+            {
+                threads.Add(System.Threading.Thread.CurrentThread.ManagedThreadId);
+
+                //TODO: process the person here
+            });
+
+            Console.WriteLine("Number of unique threads created: " + threads.Distinct().Count());
+        }
     }
 
 
