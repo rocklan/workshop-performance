@@ -32,7 +32,8 @@ namespace perf4
 
         public void WritePeoplePerCountry(string outputFileName)
         {
-            // This function is really slow. Run the performance profiler and work out what it's doing all the time.
+            // This function is really slow. Run the performance profiler and 
+            // work out what it's doing all the time.
             // You might be able to fix it by using a StringBuilder
 
             if (System.IO.File.Exists(outputFileName))

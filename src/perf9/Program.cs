@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 
 using BenchmarkDotNet.Attributes;
@@ -12,32 +13,54 @@ using BenchmarkDotNet.Running;
 
 namespace perf9
 {
-    
-    
-    public class QuickTest
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var summary = BenchmarkRunner.Run<StringTest>();
+        }
+    }
+
+    public class StringTest
     {
         [Benchmark]
-        public void ForEach()
+        public string StringConcat()
         {
-            int i = 0;
-            var people = GetPeopleEnumerate();
-            foreach (var person in people)
+            string output = "";
+            foreach (var person in GetPeopleEnumerate())
             {
-                if (++i % 100 == 0)
-                    Console.WriteLine(person.ToString());
+                output += person.ToString();
             }
+            return output;
         }
 
         [Benchmark]
-        public void ForLoop()
+        public string StringBuilder()
         {
-            var people = GetPeopleEnumerate().ToArray();
-
-            for (int i=0;i<people.Count();i++)
+            StringBuilder sb = new StringBuilder();
+            foreach (var person in GetPeopleEnumerate())
             {
-                if (i % 100 == 0)
-                    Console.WriteLine(people[i].ToString());
+                sb.Append(person.ToString());
             }
+            return sb.ToString();
+        }
+
+        [Benchmark]
+        public string StringBuilderEntirely()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var person in GetPeopleEnumerate())
+            {
+                sb.Append(person.CountryName);
+                sb.Append(" - ");
+                sb.Append(person.FirstName);
+                sb.Append(" ");
+                sb.Append(person.LastName);
+                sb.Append(Environment.NewLine);
+                sb.Append(person.ToString());
+            }
+            return sb.ToString();
         }
 
         private IEnumerable<Person> GetPeopleEnumerate()
@@ -46,7 +69,7 @@ namespace perf9
             {
                 sc.Open();
 
-                string sql = "SELECT top 1000 p.personid, p.firstname, p.lastname, c.countryname " +
+                string sql = "SELECT top 10000 p.personid, p.firstname, p.lastname, c.countryname " +
                              "FROM   person p inner join country c on p.countryid = c.countryid " +
                              "order by c.countryName";
 
@@ -98,11 +121,4 @@ namespace perf9
         }
     }
 
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var summary = BenchmarkRunner.Run<QuickTest>();
-        }
-    }
 }
