@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>People processor</h2>
+        
+        Number of people found: <b>@ViewBag.count</b><br /><br />
+        People with name hashes: <b>@ViewBag.hashcount</b><br /><br />
+        
+
+        <form action="" method="post">
+            Calculate md5's for members in batches of size: <br />
+            <input class="form-control" id="batchsize" name="batchsize" value="10000" />
+            <br />
+            <button class="btn btn-primary">Start Processing</button>
+
+            
+        </form>
+
+        <br /><br />
+        <form action="~/home/clearhashes" method="post">
+            <button class="btn btn-success">Clear Name Hashes</button>
+        </form>
+
+    </div>
+</div>

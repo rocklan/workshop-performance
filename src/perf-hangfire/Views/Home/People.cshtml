@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "People";
+}
+
+<div class="row">
+    <div class="col-sm-12">
+
+        <h1>First 1000 people</h1>
+<table class="table table-striped">
+    <tr>
+        <th>Name</th><th>Country</th><th>Hash</th>
+        </tr>
+@foreach (perf_hangfire.Controllers.Person p in ViewBag.people)
+{
+    <tr>
+        <td>@p.FirstName @p.LastName</td>
+        <td>@p.CountryName</td>
+        <td>@p.namehash</td>
+    </tr>
+}
+</table>
+
+    </div>
+</div>
