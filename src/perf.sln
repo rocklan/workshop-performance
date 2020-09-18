@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "perf9", "perf9\perf9.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "perf6b", "perf6b\perf6b.csproj", "{670766AA-9F68-479B-8EFF-71AC01D19585}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "perf-hangfire", "perf-hangfire\perf-hangfire.csproj", "{3398D218-F966-4774-A1A5-CE6BEC338ACC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "perf-hangfire", "perf-hangfire\perf-hangfire.csproj", "{3398D218-F966-4774-A1A5-CE6BEC338ACC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "perf9b", "perf9b\perf9b.csproj", "{C048941C-9DE8-4E89-9F64-C50AF1587601}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{3398D218-F966-4774-A1A5-CE6BEC338ACC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3398D218-F966-4774-A1A5-CE6BEC338ACC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3398D218-F966-4774-A1A5-CE6BEC338ACC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C048941C-9DE8-4E89-9F64-C50AF1587601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C048941C-9DE8-4E89-9F64-C50AF1587601}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C048941C-9DE8-4E89-9F64-C50AF1587601}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C048941C-9DE8-4E89-9F64-C50AF1587601}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
