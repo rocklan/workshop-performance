@@ -32,6 +32,7 @@ namespace perf5
 
         public void WritePeopleOrderedByCountry(string outputFileName)
         {
+            // TODO: Run the profiler then do less database calls, somehow
             // This function is really slow. Surely there must be a faster way 
             // to create a list of all people sorted by country name. Run the
             // profiler and see what's slow. To fix the issue, you might want

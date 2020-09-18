@@ -9,6 +9,7 @@ using System.Threading;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 
 namespace perf9
@@ -18,7 +19,15 @@ namespace perf9
     {
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<StringTest>();
+            // TODO: Execute the program, then add a unit test 
+
+            Summary summary = BenchmarkRunner.Run<StringTest>();
+            foreach (var result in summary.Reports)
+            {
+                Console.WriteLine(result.BenchmarkCase.Descriptor.WorkloadMethod.Name);
+                // mean needs to be divided by 1,000,000 then it's in MS
+                Console.WriteLine($"Mean: {result.ResultStatistics.Mean}");
+            }
         }
     }
 

@@ -32,6 +32,7 @@ namespace perf6
 
         private void CalculateChecksums(string filename)
         {
+            // TODO: Run the profiler then fix the creation of all the MD5 objects
             // This function seems really slow. Run the performance profiler and
             // work out what it's doing most of the time. To fix it, you might 
             // just need to move the order of a statement.
@@ -47,7 +48,7 @@ namespace perf6
             {
                 foreach (var person in GetPeople())
                 {
-                    using (var md5 = MD5.Create())
+                    using (MD5 md5 = MD5.Create())
                     {
                         string name = $"{person.FirstName} {person.LastName}";
 

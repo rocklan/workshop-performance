@@ -36,9 +36,11 @@ namespace perf3
 
         public void WritePeopleWithCountryName(string outputFileName)
         {
+            // TODO: Run the profiler then investigate the GetCountryNameCached() function
+
             // This function is really slow. Surely there must be a faster way 
             // to create a list of all people sorted by country name. Run the
-            // profiler and see what's slow. To fix the issue, you might want
+            // profiler and see what's going on. To fix the issue, you might want
             // to investigate the GetCountryNameCached() function
 
 

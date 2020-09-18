@@ -29,6 +29,7 @@ namespace perf_hangfire
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            //TODO: Change this to use sql server for storage then run two instances
             services.AddHangfire(x => x.UseMemoryStorage());
             services.AddHangfireServer();
         }

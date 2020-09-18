@@ -34,6 +34,7 @@ namespace perf6
 
         private void CalculateChecksums(string filename)
         {
+            // TODO: Run the profiler then remove calls that aren't needed
             // This function seems really slow. Run the performance profiler and
             // instrument the application to see what it's doing most of the time. 
             // To fix it, there might be one function that doesn't need to be called

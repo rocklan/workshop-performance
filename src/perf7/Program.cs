@@ -35,9 +35,12 @@ namespace perf7
 
         private void CalculateChecksums(string filename)
         {
-            // This function seems really slow. Run the profiler to see what's running so slow.
-            // To improve the speed, you might need to take advantage of multiple cores of your CPU. 
-            // Check out the function ParallelForEachExample() below and see what you can do.
+            // TODO: Run the profiler then look at the ParallelForEachExample() function
+            // This function seems really slow. Run the profiler to see 
+            // what's running so slow. To improve the speed, you might 
+            // need to take advantage of multiple cores of your CPU. 
+            // Check out the function ParallelForEachExample() below 
+            // and see what you can do.
 
             if (System.IO.File.Exists(filename))
             {
@@ -111,7 +114,7 @@ namespace perf7
             {
                 threads.Add(System.Threading.Thread.CurrentThread.ManagedThreadId);
 
-                //TODO: process the person here
+                //TODO: Run the profiler then add code for processing the person here
             });
 
             Console.WriteLine("Number of unique threads created: " + threads.Distinct().Count());

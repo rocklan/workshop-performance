@@ -32,6 +32,7 @@ namespace perf4
 
         public void WritePeoplePerCountry(string outputFileName)
         {
+            // TODO: Run the profiler then investigate using a StringBuilder
             // This function is really slow. Run the performance profiler and 
             // work out what it's doing all the time.
             // You might be able to fix it by using a StringBuilder

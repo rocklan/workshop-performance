@@ -32,9 +32,13 @@ namespace perf2
 
         public void WriteSurnameToFirstNameRatio(string outputFileName)
         {
-            // This function isn't quite working properly plus it's really slow. It should dump out the ratio of
+            // TODO: Run the profiler then fix the bug where exceptions are happening all the time
+
+            // This function isn't quite working properly plus it's really slow. 
+            // It should dump out the ratio of
             // the length of the surname to length of firstname.
-            // Run the performance profiler, work out what's slow, fix the bug and check the performance afterwards
+            // Run the performance profiler, work out what's slow, fix the bug 
+            // and check the performance afterwards
 
             if (System.IO.File.Exists(outputFileName))
             {

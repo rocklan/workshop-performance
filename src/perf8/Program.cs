@@ -34,9 +34,9 @@ namespace perf8
 
         public async Task WritePeopleOrderedByCountryAsync(string outputFileName)
         {
+            // TODO: Run the profiler then consider removing async and await 
             // This function seems really slow. Run the profiler and see what it's doing
             // all the time. To fix it, you might not need to be using async and await
-
 
             if (System.IO.File.Exists(outputFileName))
             {
