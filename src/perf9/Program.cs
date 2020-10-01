@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Net.Cache;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -31,6 +32,7 @@ namespace perf9
         }
     }
 
+    [MemoryDiagnoser]
     public class StringTest
     {
         [Benchmark]
@@ -55,22 +57,18 @@ namespace perf9
             return sb.ToString();
         }
 
+
         [Benchmark]
-        public string StringBuilderEntirely()
+        public string DynamicTypes()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var person in GetPeopleEnumerate())
+            foreach (var person in GetPeopleDynamic())
             {
-                sb.Append(person.CountryName);
-                sb.Append(" - ");
-                sb.Append(person.FirstName);
-                sb.Append(" ");
-                sb.Append(person.LastName);
-                sb.Append(Environment.NewLine);
-                sb.Append(person.ToString());
+                sb.Append(person.CountryName + " - " + person.FirstName + " " + person.LastName + Environment.NewLine);
             }
             return sb.ToString();
         }
+
 
         private IEnumerable<Person> GetPeopleEnumerate()
         {
@@ -81,14 +79,49 @@ namespace perf9
                 string sql = "SELECT top 10000 p.personid, p.firstname, p.lastname, c.countryname " +
                              "FROM   person p inner join country c on p.countryid = c.countryid " +
                              "order by c.countryName";
-
+                Random r = new Random();
                 using (SqlCommand command = new SqlCommand(sql, sc))
                 {
                     using (SqlDataReader sqlDataReader = command.ExecuteReader())
                     {
                         while (sqlDataReader.Read())
                         {
-                            yield return new Person(sqlDataReader);
+                            Person p = new Person(sqlDataReader);
+                            p.Age = r.Next(1000);
+                            p.Addition = r.Next(1000);
+                            yield return p;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private IEnumerable<dynamic> GetPeopleDynamic()
+        {
+            using (SqlConnection sc = new SqlConnection(_localDb))
+            {
+                sc.Open();
+
+                string sql = "SELECT top 10000 p.personid, p.firstname, p.lastname, c.countryname " +
+                             "FROM   person p inner join country c on p.countryid = c.countryid " +
+                             "order by c.countryName";
+
+                Random r = new Random();
+                using (SqlCommand command = new SqlCommand(sql, sc))
+                {
+                    using (SqlDataReader sqlDataReader = command.ExecuteReader())
+                    {
+                        while (sqlDataReader.Read())
+                        {
+                            yield return new
+                            {
+                                FirstName = sqlDataReader.GetString(1),
+                                LastName = sqlDataReader.GetString(2),
+                                CountryName = sqlDataReader.GetString(3),
+                                Age = r.Next(1000),
+                                Addition = r.Next(1000)
+                            };
                         }
                     }
                 }
@@ -114,6 +147,9 @@ namespace perf9
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int CountryID { get; set; }
+        public int Age { get; set; }
+        public int Addition { get; set; }
+
         public string CountryName { get; set; }
 
         public Person(SqlDataReader sqlDataReader)
@@ -122,6 +158,7 @@ namespace perf9
             this.FirstName = sqlDataReader.GetString(1);
             this.LastName = sqlDataReader.GetString(2);
             this.CountryName = sqlDataReader.GetString(3);
+            
         }
 
         public override string ToString()
