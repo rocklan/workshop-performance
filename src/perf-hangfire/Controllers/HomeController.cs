@@ -35,7 +35,7 @@ namespace perf_hangfire.Controllers
 
         public IActionResult People()
         {
-            ViewBag.people = new PeopleDAO().GetPeople(1000);
+            ViewBag.people = new PeopleDAO().GetPeople(10000);
 
             return View();
         }
