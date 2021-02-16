@@ -52,6 +52,8 @@ namespace perf7
             int i = 0;
             var people = GetPeople(20000);
 
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             foreach (Person person in people)
             {
                 string encrypted = StringCipher.Encrypt(person.ToString(), "my passphrase is this");
@@ -63,7 +65,9 @@ namespace perf7
                     Console.WriteLine(i);
             }
 
-            System.IO.File.AppendAllText(filename, sb.ToString());
+            stopwatch.Stop();
+
+            Console.WriteLine("Execution time of loop: " + (stopwatch.ElapsedMilliseconds / 1000).ToString("N2") + " seconds");
             
         }
 
