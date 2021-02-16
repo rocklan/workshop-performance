@@ -46,30 +46,6 @@ namespace perf9
             return output;
         }
 
-        [Benchmark]
-        public string StringBuilder()
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var person in GetPeopleEnumerate())
-            {
-                sb.Append(person.ToString());
-            }
-            return sb.ToString();
-        }
-
-
-        [Benchmark]
-        public string DynamicTypes()
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var person in GetPeopleDynamic())
-            {
-                sb.Append(person.CountryName + " - " + person.FirstName + " " + person.LastName + Environment.NewLine);
-            }
-            return sb.ToString();
-        }
-
-
         private IEnumerable<Person> GetPeopleEnumerate()
         {
             using (SqlConnection sc = new SqlConnection(_localDb))
