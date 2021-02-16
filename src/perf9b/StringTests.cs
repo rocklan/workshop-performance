@@ -14,14 +14,13 @@ namespace perf9b
     public class Tests
     {
         [Test]
-        public void ConcatenatePeoplesNames_Should_Run_Under_200ms()
+        public void ConcatenatePeoplesNames_Benchmark()
         {
             Summary summary = BenchmarkRunner.Run<StringTest>();
             double resultInMs = summary.Reports[0].ResultStatistics.Mean / 1000000;
-            Assert.Less(resultInMs, 200);
-        }
 
-        // TODO: Add unit test to validate ComputeHashForNames is performing ok
+            TestContext.WriteLine("ConcatenatePeoplesNames() took: " + resultInMs);
+        }
     }
 
 
@@ -31,7 +30,7 @@ namespace perf9b
         public string ConcatenatePeoplesNames()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var person in new PeopleDAO().GetPeopleEnumerate())
+            foreach (var person in new PeopleDAO().GetPeopleEnumerate(10000))
             {
                 sb.Append(person.ToString());
             }
@@ -45,7 +44,7 @@ namespace perf9b
         public void ComputeHashForNames()
         {
             MD5 md5 = MD5.Create();
-            foreach (var person in new PeopleDAO().GetPeopleEnumerate())
+            foreach (var person in new PeopleDAO().GetPeopleEnumerate(10000))
             {
                 byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(person.ToString());
                 
@@ -56,13 +55,13 @@ namespace perf9b
 
     public class PeopleDAO
     { 
-        public IEnumerable<Person> GetPeopleEnumerate()
+        public IEnumerable<Person> GetPeopleEnumerate(int number)
         {
             using (SqlConnection sc = new SqlConnection(_localDb))
             {
                 sc.Open();
 
-                string sql = "SELECT top 10000 p.personid, p.firstname, p.lastname, c.countryname " +
+                string sql = "SELECT top " + number + " p.personid, p.firstname, p.lastname, c.countryname " +
                              "FROM   person p inner join country c on p.countryid = c.countryid " +
                              "order by c.countryName";
 
